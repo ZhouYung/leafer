@@ -3,6 +3,7 @@ package org.ziwenxie.leafer.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -24,9 +25,9 @@ public class TagServiceImpl implements ITagService {
 
     private Logger logger;
 
-    public final String allTagsKey = "allTagsKey";
+    public String allTagsKey = "cache-key-tag-all-";
 
-    public final String oneTagKey = "oneTagKey";
+    public String oneTagKey = "cache-key-tag-one-";
 
     @Autowired
     public TagServiceImpl(TagMapper tagMapper) {
@@ -37,7 +38,7 @@ public class TagServiceImpl implements ITagService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "getAllTags", key = "#root.target.allTagsKey + #username")
+    @CacheEvict(value = "cache-value-tag-all", key = "#root.target.allTagsKey + #username")
     public Tag insertOneTag(String tagName, String username) {
         Tag isTag = getOneTagByName(tagName, username);
 
@@ -62,30 +63,29 @@ public class TagServiceImpl implements ITagService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "getOneTagById", key = "#root.target.oneTagKey + #tagId"),
-            @CacheEvict(value = "getAllTags", key = "#root.target.allTagsKey + #username")
+            @CacheEvict(value = "cache-value-tag-one" , key = "#root.target.oneTagKey + #tagId"),
+            @CacheEvict(value = "cache-value-tag-all", key = "#root.target.allTagsKey + #username")
     })
     public boolean deleteOneTagById(long tagId, String username) {
         tagMapper.deleteOneTagById(tagId);
-
         logger.info(username + " delete tag " + tagId + " successfully");
         return true;
     }
 
     @Override
-    @Cacheable(value = "getOneTagById#300#30", key = "#root.target.oneTagKey + #tagId")
+    @Cacheable(value = "cache-value-tag-one#300#30", key = "#root.target.oneTagKey + #tagId")
     public Tag getOneTagById(long tagId) {
         return tagMapper.getOneTagById(tagId);
     }
 
     @Override
-    @Cacheable(value = "getOneTagByName#300#30", key = "#tagName + #username")
+    @Cacheable(value = "cache-value-tag-one#300#30", key = "#root.target.oneTagKey + #tagName")
     public Tag getOneTagByName(String tagName, String username) {
         return tagMapper.getOneTagByName(tagName, username);
     }
 
     @Override
-    @Cacheable(value = "getAllTags#300#30", key = "#root.target.allTagsKey + #username")
+    @Cacheable(value = "cache-value-tag-all#300#30", key = "#root.target.allTagsKey + #username")
     public List<Tag> getAllTags(String username) {
         return tagMapper.getAllTags(username);
     }

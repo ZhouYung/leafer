@@ -5,11 +5,11 @@ import java.io.Serializable;
 public class ArticleTag implements Serializable {
 
     private long articleId;
+
     private long tagId;
 
     // required for mybatis
-    public ArticleTag() {
-    }
+    public ArticleTag() {}
 
     public long getArticleId() {
         return articleId;

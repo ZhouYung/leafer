@@ -48,13 +48,6 @@ public interface IArticleService {
     Article getOneArticleById(long id, String username);
 
     /**
-     * 得到一篇文章的所有标签
-     * @param id 文章id
-     * @return
-     */
-    List<Tag> getAllTagsOfOneArticle(long id);
-
-    /**
      * 得到一个用户的所有文章数量
      * @param username 用户名
      * @return 用户编写的文章数量
